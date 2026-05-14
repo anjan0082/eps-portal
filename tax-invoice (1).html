@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPS Worldwide - Tax Invoice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .invoice-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #8E2A8C;
+        }
+        .company-details h1 {
+            color: #8E2A8C;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        .company-details p {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .invoice-title h2 {
+            color: #8E2A8C;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+        .invoice-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+            font-size: 12px;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #333;
+        }
+        .meta-value {
+            color: #666;
+            text-align: right;
+        }
+        .invoice-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        .detail-section h3 {
+            color: #8E2A8C;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .detail-section p {
+            font-size: 12px;
+            color: #333;
+            line-height: 1.8;
+            margin-bottom: 3px;
+        }
+        .table-container {
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        table thead {
+            background: #8E2A8C;
+            color: white;
+        }
+        table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        table tbody tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .summary-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        .summary-row.subtotal {
+            border-top: 2px solid #ddd;
+            padding-top: 12px;
+            font-weight: bold;
+            color: #333;
+        }
+        .summary-row.gst {
+            color: #666;
+        }
+        .summary-row.total {
+            border-top: 2px solid #8E2A8C;
+            padding-top: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #8E2A8C;
+        }
+        .amount-in-words {
+            padding: 15px;
+            background: #e8d4f1;
+            border-left: 4px solid #8E2A8C;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #333;
+        }
+        .amount-in-words label {
+            font-weight: bold;
+            color: #8E2A8C;
+        }
+        .payment-info {
+            padding: 15px;
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+        .payment-info p {
+            margin-bottom: 5px;
+        }
+        .bank-details {
+            padding: 15px;
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            margin-bottom: 20px;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+        .no-print {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #8E2A8C;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #6B1F6B;
+        }
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .invoice-container {
+                max-width: 100%;
+                box-shadow: none;
+                padding: 0;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <button onclick="window.print()">🖨️ Print Invoice</button>
+        <button onclick="window.history.back()">← Back</button>
+    </div>
+
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="invoice-header">
+            <div class="company-details">
+                <h1>EPS Worldwide Integrated Logistics Pvt. Ltd.</h1>
+                <p>Unit No. 186, Solaris-1, Saki-Vihar Road, Andheri East, Mumbai - 400072</p>
+                <p>📞 Phone: 9594987185</p>
+                <p>🌐 Website: www.epsworldwide.in</p>
+                <p>📧 Email: info@epsworldwide.in</p>
+            </div>
+            <div class="invoice-title">
+                <h2>TAX INVOICE</h2>
+            </div>
+        </div>
+
+        <!-- Invoice Meta -->
+        <div class="invoice-meta">
+            <div>
+                <div class="meta-row">
+                    <span class="meta-label">Invoice No.:</span>
+                    <span class="meta-value" id="invoiceNo">EPS000001</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-label">Invoice Date:</span>
+                    <span class="meta-value" id="invoiceDate">05/05/2026</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-label">Period From:</span>
+                    <span class="meta-value" id="periodFrom">01/05/2026</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-label">Period To:</span>
+                    <span class="meta-value" id="periodTo">31/05/2026</span>
+                </div>
+            </div>
+            <div>
+                <div class="meta-row">
+                    <span class="meta-label">Forwarding Ref No.:</span>
+                    <span class="meta-value" id="forwardingRef">EPS000001</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-label">AWB No.:</span>
+                    <span class="meta-value" id="awbNo">—</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-label">Transaction ID:</span>
+                    <span class="meta-value" id="transactionId">—</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-label">Payment Method:</span>
+                    <span class="meta-value" id="paymentMethod">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FROM TO ADDRESSES -->
+        <div class="invoice-details">
+            <div class="detail-section">
+                <h3>FROM (PICKUP ADDRESS)</h3>
+                <p id="pickupAddr">Pickup Address</p>
+                <p id="pickupPin">Pincode</p>
+            </div>
+            <div class="detail-section">
+                <h3>TO (DELIVERY ADDRESS)</h3>
+                <p><strong id="custName">Customer Name</strong></p>
+                <p id="custEmail">Email: email@example.com</p>
+                <p id="custPhone">Phone: 9000000000</p>
+                <p id="deliveryAddr">Delivery Address</p>
+                <p id="deliveryPin">Pincode</p>
+            </div>
+        </div>
+
+        <!-- Order Details Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Date</th>
+                        <th>Forwarding Ref</th>
+                        <th>Origin</th>
+                        <th>Destination</th>
+                        <th>Service</th>
+                        <th>Weight</th>
+                        <th>Dimension</th>
+                        <th>Pcs</th>
+                        <th>Charges</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td id="tblDate">05/05/2026</td>
+                        <td id="tblFwd">EPS000001</td>
+                        <td id="tblOrigin">Mumbai</td>
+                        <td id="tblDest">Delhi</td>
+                        <td id="tblService">Domestic Parcel</td>
+                        <td id="tblWeight">10 kg</td>
+                        <td id="tblDim">30x20x15 cm</td>
+                        <td>1</td>
+                        <td style="text-align: right;" id="tblCharges">₹5,000.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Amount in Words -->
+        <div class="amount-in-words">
+            <label>Amount in Words:</label>
+            <span id="amountWords">Five Thousand Only</span>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <div class="summary-row subtotal">
+                <span>Subtotal (Before GST)</span>
+                <span id="subtotalAmt">₹4,100.00</span>
+            </div>
+            <div class="summary-row gst">
+                <span>CGST @ 9%</span>
+                <span id="cgstAmt">₹450.00</span>
+            </div>
+            <div class="summary-row gst">
+                <span>SGST @ 9%</span>
+                <span id="sgstAmt">₹450.00</span>
+            </div>
+            <div class="summary-row total">
+                <span>GRAND TOTAL</span>
+                <span id="totalAmt">₹5,000.00</span>
+            </div>
+        </div>
+
+        <!-- Bank Details -->
+        <div class="bank-details">
+            <strong>Bank Details for Cheque/NEFT/RTGS Payment:</strong><br><br>
+            <strong>Account Holder:</strong> EPS Worldwide Integrated Logistics Pvt. Ltd.<br>
+            <strong>Bank Name:</strong> IDFC FIRST Bank<br>
+            <strong>Branch:</strong> Mulund (Mumbai)<br>
+            <strong>Account Number:</strong> 10078883106<br>
+            <strong>Account Type:</strong> Current Account<br>
+            <strong>IFSC Code:</strong> IDFB0040109<br>
+            <strong>SWIFT ID:</strong> IDFBIN8BMUM<br>
+            <strong>Beneficiary Address:</strong> Unit No. 186, Solaris-1, Saki-Vihar Road, Andheri East, Mumbai - 400072<br><br>
+            <em>Please mention Invoice Number in the cheque leaf or bank transfer reference.</em>
+        </div>
+
+        <!-- GST Info -->
+        <div class="detail-section">
+            <p><strong>GST Details:</strong></p>
+            <p>PAN: AAFCE0777J</p>
+            <p>CIN Number: U60221MH2018PTC310559</p>
+            <p>GST NO: 27AAFCE0777JIZE</p>
+            <p>MSME NO: MH18D0175113</p>
+            <p>State Code: 27 - Maharashtra</p>
+            <p>SAC Code: 996812</p>
+        </div>
+    </div>
+
+    <script>
+        function numberToWords(num) {
+            const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+
+            function convert(n) {
+                if (n === 0) return '';
+                else if (n < 10) return ones[n];
+                else if (n < 20) return teens[n - 10];
+                else if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + ones[n % 10] : '');
+                else if (n < 1000) return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' ' + convert(n % 100) : '');
+                else if (n < 100000) return convert(Math.floor(n / 1000)) + ' Thousand' + (n % 1000 !== 0 ? ' ' + convert(n % 1000) : '');
+                else if (n < 10000000) return convert(Math.floor(n / 100000)) + ' Lakh' + (n % 100000 !== 0 ? ' ' + convert(n % 100000) : '');
+                else return convert(Math.floor(n / 10000000)) + ' Crore' + (n % 10000000 !== 0 ? ' ' + convert(n % 10000000) : '');
+            }
+            return convert(num) + ' Only';
+        }
+
+        window.addEventListener('load', function() {
+            const params = new URLSearchParams(window.location.search);
+            
+            // Get all values from URL parameters
+            const invoiceNo = params.get('invoiceNo') || 'EPS000001';
+            const invoiceDate = params.get('invoiceDate') || new Date().toLocaleDateString('en-IN');
+            const forwardingRef = params.get('forwardingRef') || invoiceNo;
+            const custName = params.get('customerName') || 'Customer Name';
+            const custEmail = params.get('customerEmail') || 'email@example.com';
+            const custPhone = params.get('customerPhone') || '9000000000';
+            const pickupAddress = params.get('pickupAddress') || 'Pickup Address';
+            const pickupPincode = params.get('pickupPincode') || 'Pincode';
+            const deliveryAddress = params.get('deliveryAddress') || 'Delivery Address';
+            const deliveryPincode = params.get('deliveryPincode') || 'Pincode';
+            const origin = params.get('origin') || 'Mumbai';
+            const destination = params.get('destination') || 'Delhi';
+            const service = params.get('service') || 'Domestic Parcel';
+            const weight = params.get('weight') || '10 kg';
+            const dimension = params.get('dimension') || '30x20x15 cm';
+            const amount = parseFloat(params.get('amount')) || 5000;
+            const paymentMethod = params.get('paymentMethod') || 'Razorpay';
+            const transactionId = params.get('transactionId') || '—';
+
+            // Set invoice meta
+            document.getElementById('invoiceNo').textContent = invoiceNo;
+            document.getElementById('invoiceDate').textContent = invoiceDate;
+            document.getElementById('forwardingRef').textContent = forwardingRef;
+            document.getElementById('awbNo').textContent = params.get('awbNo') || '—';
+            document.getElementById('transactionId').textContent = transactionId;
+            document.getElementById('paymentMethod').textContent = paymentMethod;
+
+            // SET FROM ADDRESS - PICKUP
+            document.getElementById('pickupAddr').textContent = pickupAddress;
+            document.getElementById('pickupPin').textContent = pickupPincode;
+
+            // SET TO ADDRESS - DELIVERY
+            document.getElementById('custName').textContent = custName;
+            document.getElementById('custEmail').textContent = 'Email: ' + custEmail;
+            document.getElementById('custPhone').textContent = 'Phone: ' + custPhone;
+            document.getElementById('deliveryAddr').textContent = deliveryAddress;
+            document.getElementById('deliveryPin').textContent = deliveryPincode;
+
+            // SET TABLE VALUES
+            document.getElementById('tblDate').textContent = invoiceDate;
+            document.getElementById('tblFwd').textContent = forwardingRef;
+            document.getElementById('tblOrigin').textContent = origin;
+            document.getElementById('tblDest').textContent = destination;
+            document.getElementById('tblService').textContent = service;
+            document.getElementById('tblWeight').textContent = weight;
+            document.getElementById('tblDim').textContent = dimension;
+
+            // CALCULATE GST
+            const totalAmount = Math.round(amount * 100) / 100;
+            const subtotal = Math.round((totalAmount / 1.18) * 100) / 100;
+            const cgst = Math.round(subtotal * 0.09 * 100) / 100;
+            const sgst = Math.round(subtotal * 0.09 * 100) / 100;
+            const grandTotal = Math.round(subtotal + cgst + sgst);
+
+            document.getElementById('tblCharges').textContent = '₹' + amount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('subtotalAmt').textContent = '₹' + subtotal.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('cgstAmt').textContent = '₹' + cgst.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('sgstAmt').textContent = '₹' + sgst.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('totalAmt').textContent = '₹' + grandTotal.toLocaleString('en-IN');
+            document.getElementById('amountWords').textContent = numberToWords(grandTotal);
+        });
+    </script>
+</body>
+</html>
