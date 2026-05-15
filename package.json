@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "mkdir -p .vercel/output/static && cp index.html tax-invoice.html .vercel/output/static/"
+    "build": "node build.js"
   }
 }
